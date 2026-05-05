@@ -67,8 +67,9 @@ export function MetricsOverview({ analysis }: MetricsOverviewProps) {
   const totalDuration = analysis.sessions.reduce((n, s) => n + s.duration, 0)
   const avgDuration = totalSessions > 0 ? totalDuration / totalSessions : 0
 
-  const cacheHitPct = totalTokens.totalTokens > 0
-    ? Math.round((totalTokens.cacheReadTokens / (totalTokens.inputTokens + totalTokens.cacheReadTokens || 1)) * 100)
+  const totalInputSide = totalTokens.inputTokens + totalTokens.cacheReadTokens + totalTokens.cacheCreationTokens
+  const cacheHitPct = totalInputSide > 0
+    ? Math.round((totalTokens.cacheReadTokens / totalInputSide) * 100)
     : 0
 
   const hasThinkingSessions = analysis.sessions.filter((s) => s.hasThinking).length
@@ -97,7 +98,7 @@ export function MetricsOverview({ analysis }: MetricsOverviewProps) {
   }
   const agentTypeRows = Object.entries(agentTypeTokens).sort((a, b) => b[1].tokens.totalTokens - a[1].tokens.totalTokens)
 
-  const barTotal = totalTokens.inputTokens + totalTokens.outputTokens + totalTokens.cacheReadTokens
+  const barTotal = totalTokens.inputTokens + totalTokens.outputTokens + totalTokens.cacheReadTokens + totalTokens.cacheCreationTokens
 
   return (
     <div className="space-y-3">

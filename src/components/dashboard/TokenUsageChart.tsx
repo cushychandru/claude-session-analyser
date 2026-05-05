@@ -174,15 +174,15 @@ export function TokenUsageChart({ project, selectedSession }: TokenUsageChartPro
 
   // ── Cache hit rate per session ──────────────────────────────────────────
   const cacheHitData = sortedSessions
-    .filter((s) => s.tokenUsage.inputTokens + s.tokenUsage.cacheReadTokens > 0)
+    .filter((s) => s.tokenUsage.inputTokens + s.tokenUsage.cacheReadTokens + s.tokenUsage.cacheCreationTokens > 0)
     .slice(0, 20)
-    .map((s) => ({
-      name: s.title.slice(0, 16),
-      "Cache Hit %": Math.round(
-        (s.tokenUsage.cacheReadTokens /
-          (s.tokenUsage.inputTokens + s.tokenUsage.cacheReadTokens)) * 100
-      ),
-    }))
+    .map((s) => {
+      const inputSide = s.tokenUsage.inputTokens + s.tokenUsage.cacheReadTokens + s.tokenUsage.cacheCreationTokens
+      return {
+        name: s.title.slice(0, 16),
+        "Cache Hit %": Math.round((s.tokenUsage.cacheReadTokens / inputSide) * 100),
+      }
+    })
 
   // ── Output/Input ratio per session ──────────────────────────────────────
   const outputInputData = sortedSessions

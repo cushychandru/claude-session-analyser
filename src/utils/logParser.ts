@@ -109,22 +109,27 @@ function mergeTokenUsage(a: TokenUsageSummary, b: TokenUsageSummary): TokenUsage
 }
 
 /**
- * Returns every assistant entry that carries a `usage` block — including duplicate
- * lines for the same message.id (one per content block in a streamed response).
- * Filters out synthetic / isMeta rows that aren't real assistant turns.
- *
- * Note: this matches Claude's account-level usage chart, which appears to count
- * raw log rows. The deduplicated count (one per message.id) is lower but is the
- * count actually returned by the API. Keep both behaviors in mind when comparing.
+ * Returns one assistant entry per message.id for token counting.
+ * Streaming logs write multiple JSONL rows per message (one per content block),
+ * each carrying identical cumulative token counts. Summing without dedup overcounts
+ * by the duplication factor. We keep the last row per rawMessageId (which holds the
+ * final token values) and discard synthetic / isMeta rows.
  */
 export function dedupeAssistantForTokens(messages: ParsedMessage[]): ParsedMessage[] {
-  return messages.filter(
+  const filtered = messages.filter(
     (m) =>
       m.role === "assistant" &&
       !m.isMeta &&
       m.model !== "<synthetic>" &&
       !!m.usage,
   )
+  // Last-write-wins per rawMessageId: streaming chunks carry identical counts,
+  // so any occurrence is fine — last is safest (most complete).
+  const seen = new Map<string, ParsedMessage>()
+  for (const m of filtered) {
+    seen.set(m.rawMessageId ?? m.uuid, m)
+  }
+  return Array.from(seen.values())
 }
 
 function aggregateTokens(messages: ParsedMessage[], opts: { includeSidechain?: boolean } = {}): TokenUsageSummary {

@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm"
 import { User, Bot, Brain, Wrench, ChevronDown, ChevronRight, FileText, Zap, Settings } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
+import { Tooltip } from "@/components/ui/tooltip"
 import { formatTimestamp, formatNumber } from "@/utils/logParser"
 import type { ParsedMessage, ContentBlock } from "@/types/logs"
 import { cn } from "@/lib/utils"
@@ -140,10 +141,26 @@ function MessageBubble({ message }: { message: ParsedMessage }) {
           </span>
           <span className="text-xs text-muted-foreground">{formatTimestamp(message.timestamp)}</span>
           {message.usage && (
-            <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-              <Zap className="h-3 w-3" />
-              {formatNumber((message.usage.input_tokens ?? 0) + (message.usage.output_tokens ?? 0))} tok
-            </span>
+            <Tooltip
+              className="text-left"
+              content={
+                <span className="flex flex-col gap-0.5">
+                  <span>Input: {formatNumber(message.usage.input_tokens ?? 0)}</span>
+                  <span>Output: {formatNumber(message.usage.output_tokens ?? 0)}</span>
+                  {(message.usage.cache_read_input_tokens ?? 0) > 0 && (
+                    <span>Cache Read: {formatNumber(message.usage.cache_read_input_tokens ?? 0)}</span>
+                  )}
+                  {(message.usage.cache_creation_input_tokens ?? 0) > 0 && (
+                    <span>Cache Write: {formatNumber(message.usage.cache_creation_input_tokens ?? 0)}</span>
+                  )}
+                </span>
+              }
+            >
+              <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground cursor-default">
+                <Zap className="h-3 w-3" />
+                {formatNumber((message.usage.input_tokens ?? 0) + (message.usage.output_tokens ?? 0))} tok
+              </span>
+            </Tooltip>
           )}
         </div>
 
