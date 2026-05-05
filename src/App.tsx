@@ -3,7 +3,7 @@ import { FileUpload } from "@/components/upload/FileUpload"
 import { SessionDashboard } from "@/components/dashboard/SessionDashboard"
 import { analyzeFiles } from "@/utils/logParser"
 import type { UploadedFile, ProjectAnalysis } from "@/types/logs"
-import { LayoutDashboard, Upload, RotateCcw, AlertTriangle, CheckCircle2, X, ExternalLink, Shield, FolderOpen, MousePointerClick } from "lucide-react"
+import { LayoutDashboard, Upload, RotateCcw, AlertTriangle, CheckCircle2, X, ExternalLink, Shield, FolderOpen, MousePointerClick, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type AddMoreStatus = {
@@ -161,12 +161,19 @@ export default function App() {
           <span className="font-mono text-foreground">.jsonl</span> files to explore conversations,
           tool calls, subagents, and token usage — all processed locally, nothing uploaded.
         </p>
+        <div className="flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">
+          <Shield className="h-3 w-3" aria-hidden="true" />
+          100% private — nothing leaves your browser
+        </div>
       </header>
 
       {/* Upload area */}
       <section aria-label="Upload Claude Code session logs" className="w-full">
         <FileUpload onFilesLoaded={handleFilesLoaded} />
       </section>
+
+      {/* Slideshow preview */}
+      <ScreenshotSlideshow />
 
       {/* Features */}
       <section aria-labelledby="features-heading" className="w-full max-w-5xl">
@@ -275,7 +282,16 @@ export default function App() {
             </a>
           </p>
           <p className="text-xs text-muted-foreground">
-            Open source · Free forever ·{" "}
+            Open source · Free forever · Hosted on{" "}
+            <a
+              href="https://pages.cloudflare.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground/80 transition-colors"
+            >
+              Cloudflare Pages
+            </a>
+            {" "}·{" "}
             <a
               href="https://claude-session-analyser.pages.dev/"
               className="hover:text-foreground/80 transition-colors"
@@ -352,6 +368,86 @@ function AddMoreProgress({
 
 import { MessageSquare, Wrench, Bot, BarChart2, Clock, Zap } from "lucide-react"
 
+function ScreenshotSlideshow() {
+  const [current, setCurrent] = React.useState(0)
+  const [dir, setDir] = React.useState<"next" | "prev">("next")
+  const total = SCREENSHOTS.length
+
+  React.useEffect(() => {
+    const t = setInterval(() => { setDir("next"); setCurrent(c => (c + 1) % total) }, 3800)
+    return () => clearInterval(t)
+  }, [total])
+
+  const go = (idx: number, d: "next" | "prev") => { setDir(d); setCurrent(idx) }
+  const prev = () => go((current - 1 + total) % total, "prev")
+  const next = () => go((current + 1) % total, "next")
+  const s = SCREENSHOTS[current]
+
+  return (
+    <section aria-labelledby="preview-heading" className="w-full max-w-5xl">
+      <div className="text-center mb-6">
+        <h2 id="preview-heading" className="text-2xl md:text-3xl font-bold text-foreground mb-2 tracking-tight">
+          See it in action
+        </h2>
+        <p className="text-base text-muted-foreground max-w-xl mx-auto">
+          Real session data — explore every view your logs unlock
+        </p>
+      </div>
+
+      <div className="relative rounded-2xl border border-border bg-card overflow-hidden shadow-2xl">
+        {/* Image */}
+        <div className="relative overflow-hidden bg-[#0a0a0f]" style={{ aspectRatio: "16/9" }}>
+          <img
+            key={`${current}-${dir}`}
+            src={s.src}
+            alt={s.title}
+            className={`w-full h-full object-contain ${dir === "next" ? "ss-enter-next" : "ss-enter-prev"}`}
+          />
+          {/* Tab badge */}
+          <span className="absolute top-3 left-3 rounded-md bg-black/50 backdrop-blur-sm border border-white/10 px-2.5 py-1 text-xs font-semibold text-white">
+            {s.title}
+          </span>
+
+          {/* Prev button */}
+          <button
+            onClick={prev}
+            aria-label="Previous screenshot"
+            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white hover:bg-black/60 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+
+          {/* Next button */}
+          <button
+            onClick={next}
+            aria-label="Next screenshot"
+            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white hover:bg-black/60 transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Description + dots */}
+        <div className="flex items-center justify-between gap-4 px-5 py-3 border-t border-border">
+          <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+          <div className="flex shrink-0 gap-1.5">
+            {SCREENSHOTS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => go(i, i > current ? "next" : "prev")}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === current ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 const FEATURES = [
   { icon: MessageSquare, title: "Conversation View", desc: "Browse full chat threads with thinking blocks", color: "bg-blue-500/10 text-blue-400" },
   { icon: Wrench, title: "Tool Call Analysis", desc: "Frequency charts and per-call input/output", color: "bg-green-500/10 text-green-400" },
@@ -387,6 +483,17 @@ const HOW_TO_USE: { icon: React.ElementType; title: string; desc: string; code?:
     title: "Add more files without losing context",
     desc: "Use the 'Add More Files' button in the top-right corner to load additional sessions on top of what's already open. This is useful for comparing sessions or loading subagent logs alongside the main session.",
   },
+]
+
+const SCREENSHOTS = [
+  { tab: "overview",      src: "/screenshots/overview.png",      title: "Overview",      desc: "Session metrics at a glance — messages, tool calls, subagents, token totals, and cache hit rates." },
+  { tab: "conversation",  src: "/screenshots/conversation.png",  title: "Conversation",  desc: "Full chat thread with thinking blocks expanded, tool calls inline, and message-level token counts." },
+  { tab: "tools",         src: "/screenshots/tools.png",         title: "Tool Calls",    desc: "Frequency chart of every tool used, plus per-call input/output details and duration." },
+  { tab: "subagents",     src: "/screenshots/subagents.png",     title: "Subagents",     desc: "Each spawned agent with its own message thread, tool usage, and token breakdown." },
+  { tab: "charts",        src: "/screenshots/charts.png",        title: "Charts",        desc: "Visual bar and pie charts for token distribution, tool usage patterns, and cache efficiency." },
+  { tab: "timeline",      src: "/screenshots/timeline.png",      title: "Timeline",      desc: "Chronological view of every message and tool call — spot bottlenecks at a glance." },
+  { tab: "prompts",       src: "/screenshots/prompts.png",       title: "Prompts",       desc: "Every user prompt listed with timestamps and token counts for quick review." },
+  { tab: "cost",          src: "/screenshots/cost.png",          title: "Cost",          desc: "Estimated cost breakdown by model, token type, and session for budget tracking." },
 ]
 
 const TIPS = [

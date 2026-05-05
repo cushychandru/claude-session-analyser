@@ -1,3 +1,14 @@
+@keyframes ss-fade-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes ss-fade-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.ss-enter-next { animation: ss-fade-in      0.35s ease both; }
+.ss-enter-prev { animation: ss-fade-in-left 0.35s ease both; }
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
