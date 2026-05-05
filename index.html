@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+    <!-- Primary SEO -->
+    <title>Claude Session Analyser — Inspect Claude Code Logs, Tokens &amp; Subagents</title>
+    <meta
+      name="description"
+      content="Free browser-based viewer for Claude Code session logs. Inspect conversations, tool calls, subagents, and token usage — fully client-side, no upload."
+    />
+    <meta
+      name="keywords"
+      content="Claude Code, session analyser, jsonl viewer, claude logs, token usage, subagent tracker, tool call analysis, anthropic, claude code dashboard, conversation viewer"
+    />
+    <meta name="author" content="Claude Session Analyser" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="canonical" href="https://cushychandru.github.io/claude-session-analyser/" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="mask-icon" href="/favicon.svg" color="#863bff" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Claude Session Analyser" />
+    <meta property="og:title" content="Claude Session Analyser — Inspect Claude Code Logs, Tokens &amp; Subagents" />
+    <meta
+      property="og:description"
+      content="Drop in your Claude Code .jsonl session logs and explore conversations, tool calls, subagents, and token usage with rich charts and timelines. Runs entirely in your browser."
+    />
+    <meta property="og:image" content="https://cushychandru.github.io/claude-session-analyser/favicon.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:alt" content="Claude Session Analyser logo" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://cushychandru.github.io/claude-session-analyser/" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Claude Session Analyser — Inspect Claude Code Logs" />
+    <meta
+      name="twitter:description"
+      content="Browser-based viewer for Claude Code session logs. Tokens, tool calls, subagents, timelines — no upload, fully client-side."
+    />
+    <meta name="twitter:image" content="https://cushychandru.github.io/claude-session-analyser/favicon.svg" />
+    <meta name="twitter:image:alt" content="Claude Session Analyser logo" />
+
+    <!-- Performance hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Claude Session Analyser",
+        "description": "Browser-based analyser for Claude Code session logs (.jsonl). Visualise conversations, tool calls, subagents, and token usage entirely client-side.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any (browser)",
+        "browserRequirements": "Requires a modern browser with ES2020 support",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Conversation view with thinking blocks",
+          "Tool call frequency and per-call details",
+          "Subagent tracking",
+          "Token metrics (input, output, cache reads/writes)",
+          "Visual charts (bar, pie)",
+          "Chronological session timeline",
+          "100% client-side processing"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="font-family: system-ui, sans-serif; max-width: 640px; margin: 4rem auto; padding: 1.5rem; text-align: center; line-height: 1.5;">
+        <h1>Claude Session Analyser</h1>
+        <p>This app analyses Claude Code session logs entirely in your browser. JavaScript must be enabled to use it.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

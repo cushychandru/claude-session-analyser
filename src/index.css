@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 13%;
+    --card-foreground: 213 31% 91%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --primary: 265 89% 70%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 222 47% 18%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 222 47% 16%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 265 89% 70%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 213 31% 91%;
+    --ring: 265 89% 70%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  #root {
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+    min-height: 100svh;
+  }
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: hsl(var(--muted)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+.thinking-block {
+  background: linear-gradient(135deg, hsl(265 89% 70% / 0.06), transparent);
+  border-left: 2px solid hsl(265 89% 70% / 0.35);
+}
+
+.tool-use-block {
+  background: linear-gradient(135deg, hsl(142 71% 45% / 0.08), transparent);
+  border-left: 2px solid hsl(142 71% 45% / 0.4);
+}
+
+.tool-result-block {
+  background: linear-gradient(135deg, hsl(200 80% 50% / 0.08), transparent);
+  border-left: 2px solid hsl(200 80% 50% / 0.4);
+}
+
+.drag-over {
+  border-color: hsl(var(--primary)) !important;
+  background: hsl(var(--primary) / 0.05) !important;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes subtlePulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(45 96% 53% / 0); }
+  50%       { box-shadow: 0 0 16px 2px hsl(45 96% 53% / 0.25); }
+}

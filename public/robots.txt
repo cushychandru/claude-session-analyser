@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cushychandru.github.io/claude-session-analyser/sitemap.xml
