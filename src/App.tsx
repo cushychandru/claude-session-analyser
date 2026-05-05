@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef } from "react"
+import React, { useState, useCallback, useRef } from "react"
 import { FileUpload } from "@/components/upload/FileUpload"
 import { SessionDashboard } from "@/components/dashboard/SessionDashboard"
 import { analyzeFiles } from "@/utils/logParser"
 import type { UploadedFile, ProjectAnalysis } from "@/types/logs"
-import { LayoutDashboard, Upload, RotateCcw, AlertTriangle, CheckCircle2, X } from "lucide-react"
+import { LayoutDashboard, Upload, RotateCcw, AlertTriangle, CheckCircle2, X, ExternalLink, Shield, FolderOpen, MousePointerClick } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type AddMoreStatus = {
@@ -147,7 +147,7 @@ export default function App() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center p-8 gap-10">
+    <main className="min-h-screen flex flex-col items-center p-8 gap-12">
       {/* Hero */}
       <header className="flex flex-col items-center gap-3 text-center mt-8">
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 border border-primary/20">
@@ -156,10 +156,10 @@ export default function App() {
         <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
           Claude Session Analyser
         </h1>
-        <p className="mt-1 text-sm md:text-base text-muted-foreground max-w-xl">
+        <p className="mt-1 text-sm md:text-base text-muted-foreground max-w-2xl">
           A free, browser-based viewer for Claude Code session logs. Drop in your{" "}
           <span className="font-mono text-foreground">.jsonl</span> files to explore conversations,
-          tool calls, subagents, and token usage — all processed locally, with nothing uploaded.
+          tool calls, subagents, and token usage — all processed locally, nothing uploaded.
         </p>
       </header>
 
@@ -169,9 +169,11 @@ export default function App() {
       </section>
 
       {/* Features */}
-      <section aria-labelledby="features-heading" className="w-full max-w-2xl">
-        <h2 id="features-heading" className="sr-only">Features</h2>
-        <ul className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <section aria-labelledby="features-heading" className="w-full max-w-5xl">
+        <h2 id="features-heading" className="text-base font-semibold text-foreground mb-3 text-center">
+          What you can explore
+        </h2>
+        <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {FEATURES.map((f) => (
             <li
               key={f.title}
@@ -189,34 +191,99 @@ export default function App() {
         </ul>
       </section>
 
-      {/* How it works */}
-      <section aria-labelledby="how-heading" className="w-full max-w-2xl">
+      {/* How to use — detailed */}
+      <section aria-labelledby="how-heading" className="w-full max-w-5xl">
         <h2 id="how-heading" className="text-base font-semibold text-foreground mb-3 text-center">
-          How it works
+          How to use
         </h2>
-        <ol className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-muted-foreground">
-          <li className="rounded-lg border border-border bg-card p-3">
-            <span className="block text-foreground font-semibold mb-1">1. Find your logs</span>
-            Claude Code stores sessions under{" "}
-            <span className="font-mono text-foreground/70">~/.claude/projects/</span>.
-          </li>
-          <li className="rounded-lg border border-border bg-card p-3">
-            <span className="block text-foreground font-semibold mb-1">2. Drop them in</span>
-            Select individual <span className="font-mono">.jsonl</span> files or a whole project folder.
-          </li>
-          <li className="rounded-lg border border-border bg-card p-3">
-            <span className="block text-foreground font-semibold mb-1">3. Explore</span>
-            Inspect tool calls, subagents, tokens, cache reads, and the timeline.
-          </li>
+        <ol className="flex flex-col gap-3">
+          {HOW_TO_USE.map((step, i) => (
+            <li key={step.title} className="flex gap-4 rounded-lg border border-border bg-card p-4">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 border border-primary/20">
+                <step.icon className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground mb-1">
+                  <span className="text-muted-foreground mr-1">{i + 1}.</span>{step.title}
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+                {step.osPaths && (
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {step.osPaths.map((p) => (
+                      <div key={p.os} className="rounded bg-muted/60 px-3 py-2">
+                        <p className="text-[10px] font-semibold text-foreground/60 mb-1">{p.os}</p>
+                        <code className="font-mono text-[11px] text-foreground/80 break-all">{p.path}</code>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {step.code && (
+                  <code className="mt-1.5 block rounded bg-muted/60 px-2 py-1 font-mono text-[11px] text-foreground/80 break-all">
+                    {step.code}
+                  </code>
+                )}
+              </div>
+            </li>
+          ))}
         </ol>
       </section>
 
-      {/* Footer hint */}
-      <footer className="text-xs text-muted-foreground text-center max-w-xl">
-        <p>
-          Logs are processed entirely in your browser — nothing is uploaded to any server,
-          and no analytics or trackers run on this page.
-        </p>
+      {/* Tips */}
+      <section aria-labelledby="tips-heading" className="w-full max-w-5xl">
+        <h2 id="tips-heading" className="text-base font-semibold text-foreground mb-3 text-center">
+          Tips &amp; tricks
+        </h2>
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {TIPS.map((tip) => (
+            <li key={tip.title} className="rounded-lg border border-border bg-card p-4">
+              <p className="text-xs font-semibold text-foreground mb-1">{tip.title}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{tip.desc}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Privacy */}
+      <section className="w-full max-w-5xl">
+        <div className="flex items-start gap-3 rounded-lg border border-green-500/20 bg-green-500/5 p-4">
+          <Shield className="h-4 w-4 text-green-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <div>
+            <p className="text-xs font-semibold text-green-300 mb-1">100% private — nothing leaves your browser</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              All parsing and analysis runs locally via WebAssembly and JavaScript. Your session logs
+              contain sensitive conversation data — they are never sent to any server, API, or third-party
+              service. No analytics, no telemetry, no cookies.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer — privacy note + developer */}
+      <footer className="w-full max-w-5xl flex flex-col items-center gap-4 pb-4">
+        <div className="w-full h-px bg-border" />
+        <div className="flex flex-col items-center gap-2 text-center">
+          <p className="text-xs text-muted-foreground">
+            Built by{" "}
+            <a
+              href="https://www.linkedin.com/in/chandrashekhar-gouda/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-foreground/80 hover:text-primary transition-colors font-medium"
+            >
+              Chandrashekhar Gouda
+              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+            </a>
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Open source · Free forever ·{" "}
+            <a
+              href="https://claude-session-analyser.pages.dev/"
+              className="hover:text-foreground/80 transition-colors"
+            >
+              claude-session-analyser.pages.dev
+            </a>
+          </p>
+        </div>
       </footer>
     </main>
   )
@@ -292,4 +359,59 @@ const FEATURES = [
   { icon: Zap, title: "Token Metrics", desc: "Input, output, cache reads/writes breakdown", color: "bg-violet-500/10 text-violet-400" },
   { icon: BarChart2, title: "Visual Charts", desc: "Bar and pie charts for usage patterns", color: "bg-cyan-500/10 text-cyan-400" },
   { icon: Clock, title: "Timeline View", desc: "Chronological view of all session activity", color: "bg-pink-500/10 text-pink-400" },
+]
+
+const HOW_TO_USE: { icon: React.ElementType; title: string; desc: string; code?: string; osPaths?: { os: string; path: string }[] }[] = [
+  {
+    icon: FolderOpen,
+    title: "Find your Claude Code session logs",
+    desc: "Claude Code saves every session as a .jsonl file inside a per-project folder. Each file is named by its UUID. Find it based on your OS:",
+    osPaths: [
+      { os: "Windows", path: "%USERPROFILE%\\.claude\\projects\\<project-slug>\\" },
+      { os: "macOS", path: "~/.claude/projects/<project-slug>/" },
+      { os: "Linux", path: "~/.claude/projects/<project-slug>/" },
+    ],
+  },
+  {
+    icon: Upload,
+    title: "Drop or select the files",
+    desc: "Click the upload area or drag-and-drop one or more .jsonl files directly. You can load a single session or multiple sessions at once — they will be merged and deduplicated automatically.",
+  },
+  {
+    icon: MousePointerClick,
+    title: "Select a session from the sidebar",
+    desc: "After loading, the left sidebar lists every session with its date and token count. Click any row to open it. Use the tabs — Conversation, Tool Calls, Subagents, Tokens, Timeline — to explore different views.",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Add more files without losing context",
+    desc: "Use the 'Add More Files' button in the top-right corner to load additional sessions on top of what's already open. This is useful for comparing sessions or loading subagent logs alongside the main session.",
+  },
+]
+
+const TIPS = [
+  {
+    title: "Load the main session + subagent logs together",
+    desc: "If Claude spawned subagents, each one has its own .jsonl. Load all of them at once to see the full call tree and accurate token totals across the entire run.",
+  },
+  {
+    title: "Subagent-only warning banner",
+    desc: "If you only load subagent files (no main UUID file), a warning banner appears at the top. Upload the parent session to get the complete picture.",
+  },
+  {
+    title: "Use the Timeline tab for long sessions",
+    desc: "The Timeline view shows every message and tool call in chronological order, making it easy to spot where time was spent or where a session went wrong.",
+  },
+  {
+    title: "Token breakdown helps estimate costs",
+    desc: "The Tokens tab shows input, output, cache-read, and cache-write counts separately. Cache reads are billed at 10% of input — the breakdown helps you understand your actual spend.",
+  },
+  {
+    title: "Nothing is ever uploaded",
+    desc: "All processing happens in your browser. You can disconnect from the internet after loading the page and it will still work — ideal for sensitive codebases.",
+  },
+  {
+    title: "Reset and start fresh",
+    desc: "Use the Reset button (top-right) to clear all loaded sessions and return to the upload screen without reloading the page.",
+  },
 ]
