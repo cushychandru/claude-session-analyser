@@ -173,18 +173,18 @@ export default function App() {
         <h2 id="features-heading" className="text-base font-semibold text-foreground mb-3 text-center">
           What you can explore
         </h2>
-        <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {FEATURES.map((f) => (
             <li
               key={f.title}
-              className="flex items-start gap-3 rounded-lg border border-border p-3 bg-card"
+              className="flex items-start gap-4 rounded-xl border border-border p-5 bg-card"
             >
-              <div className={`rounded-lg p-1.5 ${f.color} shrink-0`}>
-                <f.icon className="h-4 w-4" aria-hidden="true" />
+              <div className={`rounded-lg p-2.5 ${f.color} shrink-0`}>
+                <f.icon className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
-                <h3 className="text-xs font-semibold text-foreground">{f.title}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">{f.desc}</p>
+                <h3 className="text-sm font-semibold text-foreground">{f.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{f.desc}</p>
               </div>
             </li>
           ))}
