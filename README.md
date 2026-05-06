@@ -1,73 +1,181 @@
-# React + TypeScript + Vite
+# Claude Session Analyser
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A free, browser-based dashboard for exploring Claude Code session logs. Drop in your `.jsonl` files to inspect conversations, tool calls, subagents, token usage, and costs — all processed locally, nothing uploaded.
 
-Currently, two official plugins are available:
+**Live:** [claude-session-analyser.pages.dev](https://claude-session-analyser.pages.dev/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> 100% private — nothing leaves your browser. All parsing runs locally via JavaScript. Works fully offline after the initial page load.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
+### 1. Find Your Session Logs
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Claude Code writes session logs to a per-project folder based on your working directory:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| OS | Path |
+| --- | --- |
+| Windows | `%USERPROFILE%\.claude\projects\<project-slug>\` |
+| macOS / Linux | `~/.claude/projects/<project-slug>/` |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Each `.jsonl` file is named by its session UUID. Subagent files are prefixed `agent-`.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 2. Load Files
+
+Go to [claude-session-analyser.pages.dev](https://claude-session-analyser.pages.dev/), then either:
+
+- **Drag and drop** one or more `.jsonl` files onto the upload area
+- Click **Select Files** to pick individual files
+- Click **Select Folder** to load an entire project folder at once (fastest)
+
+### 3. Explore
+
+The left sidebar lists every loaded session. Click one to open it, then use the tabs to explore different views.
+
+---
+
+## Features
+
+### Overview
+
+At-a-glance stats for the selected session: message count, tool calls, subagents spawned, total tokens, cache hit rate, and average session duration.
+
+![Overview](public/screenshots/overview.png)
+
+---
+
+### Conversation
+
+Full chat thread with thinking blocks expanded inline. Tool calls show their inputs and outputs directly inside the message. Each assistant message displays an input + output token badge — hover it to see the full breakdown including cache reads and cache writes.
+
+![Conversation](public/screenshots/conversation.png)
+
+---
+
+### Tools
+
+Bar chart of tool call frequency and a full table of every call in the session. Each row shows the tool name, input arguments (JSON), output, and duration.
+
+![Tools](public/screenshots/tools.png)
+
+---
+
+### Subagents
+
+Lists every subagent Claude spawned during the session, with message counts, tool usage, and token totals per agent. Load the subagent `.jsonl` files alongside the main session for full detail.
+
+![Subagents](public/screenshots/subagents.png)
+
+---
+
+### Charts
+
+Visual token breakdown — input, output, cache read, and cache write — as bar and pie charts. Also shows cache hit rate per session and output/input ratio trends.
+
+![Charts](public/screenshots/charts.png)
+
+---
+
+### Timeline
+
+Chronological list of every message and tool call with timestamps. Useful for spotting where time was spent or where a session went off track.
+
+![Timeline](public/screenshots/timeline.png)
+
+---
+
+### Prompts
+
+Extracted user prompts only — system context injections and tool results stripped out. Useful for reviewing what you actually asked across a long session.
+
+![Prompts](public/screenshots/prompts.png)
+
+---
+
+### Cost
+
+Estimated cost per session and per model, calculated from token counts using current Claude pricing. Breaks down spend across input, output, cache reads, and cache writes.
+
+![Cost](public/screenshots/cost.png)
+
+---
+
+## Token Counting
+
+### Token Types
+
+| Token Type | Anthropic Field | Billed At | What It Means |
+| --- | --- | --- | --- |
+| Input | `input_tokens` | 100% | New tokens Claude read this turn |
+| Output | `output_tokens` | 100% | Tokens Claude generated |
+| Cache Read | `cache_read_input_tokens` | ~10% | Tokens served from prompt cache |
+| Cache Write | `cache_creation_input_tokens` | ~125% | Tokens written into the prompt cache |
+
+### Streaming Deduplication
+
+Claude Code's streaming API writes **multiple JSONL rows per assistant message** — one per content block — each carrying the same cumulative token counts. Naively summing all rows overcounts by a factor equal to the number of content blocks.
+
+The analyser deduplicates by keeping only the last row per Anthropic message ID, so each message is counted exactly once:
+
+```text
+Raw JSONL (3 rows for one streamed message):
+  { id: "msg_abc", input: 3, output: 238, cache_read: 14126, cache_write: 8449 }
+  { id: "msg_abc", input: 3, output: 238, cache_read: 14126, cache_write: 8449 }
+  { id: "msg_abc", input: 3, output: 238, cache_read: 14126, cache_write: 8449 }
+
+After dedup (1 unique message):
+  { id: "msg_abc", input: 3, output: 238, cache_read: 14126, cache_write: 8449 }
+
+Without dedup:  22,816 tokens counted  ✗
+With dedup:      7,605 tokens counted  ✓
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Cache Hit Rate Formula
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+cacheHitPct = cacheReadTokens / (inputTokens + cacheReadTokens + cacheCreationTokens)
 ```
+
+Cache creation tokens are included in the denominator because they are processed on the input side even when being written to cache.
+
+---
+
+## Tips
+
+- **Load the main session + all subagent logs together** for accurate cross-agent token totals and the full call tree
+- **Select Folder** is the fastest way to load everything — point it at the project folder
+- **Add More Files** (top-right) lets you add logs without clearing what's already open
+- **Reset** (top-right) clears all loaded sessions and returns to the upload screen
+
+---
+
+## Local Development
+
+```bash
+git clone https://github.com/your-username/claude-session-analyser
+cd claude-session-analyser
+npm install
+npm run dev       # http://localhost:5173
+npm run build     # production build → dist/
+```
+
+---
+
+## Contributing
+
+1. Fork the repo
+2. `npm install && npm run dev`
+3. Make your changes
+4. `npm run lint && npm run build`
+5. Open a PR against `main`
+
+---
+
+## License
+
+MIT — free to use, fork, and self-host.
+
+---
+
+Built by [Chandrashekhar Gouda](https://www.linkedin.com/in/chandrashekhar-gouda/) · Open source · Hosted on [Cloudflare Pages](https://pages.cloudflare.com/)
