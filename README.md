@@ -47,7 +47,7 @@ At-a-glance stats for the selected session: message count, tool calls, subagents
 
 ### Conversation
 
-Full chat thread with thinking blocks expanded inline. Tool calls show their inputs and outputs directly inside the message. Each assistant message displays an input + output token badge — hover it to see the full breakdown including cache reads and cache writes.
+Full chat thread with thinking blocks expanded inline. Tool calls show their inputs and outputs directly inside the message. Each assistant message displays an `input + output` token badge — hover it to see the full per-turn breakdown: input, output, cache read, and cache write tokens separately.
 
 ![Conversation](public/screenshots/conversation.png)
 
@@ -79,7 +79,13 @@ Visual token breakdown — input, output, cache read, and cache write — as bar
 
 ### Timeline
 
-Chronological list of every message and tool call with timestamps. Useful for spotting where time was spent or where a session went off track.
+Chronological list of every message and tool call with timestamps. Between each pair of entries a **gap indicator** shows exactly where time was spent:
+
+- **Claude** (violet) — time Claude spent generating the response, including thinking
+- **Tool exec** (cyan) — time the tool took to run; Claude was idle
+- **Waiting** (muted) — time before the next user message
+
+Hover any dot to see a rich tooltip: model name, token counts (input/output/cache read/cache write), thinking flag, tool names called, and message preview. Hover a gap indicator to see exact from/to timestamps and duration.
 
 ![Timeline](public/screenshots/timeline.png)
 
